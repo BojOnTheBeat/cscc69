@@ -338,7 +338,7 @@ int error_check(int cmd, int syscall, int pid){
 
 	//***EBUSY conditions***
 	//BOJ: SURROUND BY LOCKS WHEN DEALING WITH PIDLISTS WHICH WE ARE
-	if(table[syscall].interepted == 1 && cmd == REQUEST_SYSCALL_INTERCEPT){
+	if(table[syscall].intercepted == 1 && cmd == REQUEST_SYSCALL_INTERCEPT){
 		return -EBUSY;
 	}
 
