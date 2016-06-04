@@ -291,7 +291,8 @@ asmlinkage long interceptor(struct pt_regs reg) {
 	spin_lock(&calltable_lock);
 	spin_lock(&pidlist_lock);
 
-	long func = table[reg.ax].f(reg); //BOJ: CROSSCHECK THIS
+	long func;
+	func = table[reg.ax].f(reg); //BOJ: CROSSCHECK THIS
 
 	if (check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1){ //BOJ: crosscheck?
 		log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp); //info about pid and syscall
@@ -358,7 +359,7 @@ int error_check(int cmd, int syscall, int pid){
 	}
 
 	//***Last 2 commands***
-	if (cmd == REQUEST_START_MONITORING || cmd = REQUEST_STOP_MONITORING){
+	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING){
 		
 		//BOJ: crosscheck use of check_pid_from_list function
 		if (current_uid() != 0 && check_pid_from_list(current_uid(), pid) != 0){
@@ -476,7 +477,8 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	spin_lock(&calltable_lock);
 	spin_lock(&pidlist_lock);
 
-	int error = error_check(cmd, syscall, pid);
+	int error;
+	error = error_check(cmd, syscall, pid);
 	if (error != 0){
 		spin_unlock(&pidlist_lock);//unlock before returning to avoid problems
 		spin_unlock(&calltable_lock);
@@ -545,7 +547,7 @@ static int init_function(void) {
 
 	//Initialize bookkeeping data structures.
 	for(i=0; i < NR_syscalls; i++){
-		table[i].interepted = 0;
+		table[i].intercepted = 0;
 		table[i].monitored = 0;
 		table[i].listcount = 0;
 		INIT_LIST_HEAD(&table[i].my_list);
