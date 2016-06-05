@@ -474,10 +474,11 @@ int request_intercept(int syscall){
  */
 asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
+	int error, req;
+
 	spin_lock(&calltable_lock);
 	spin_lock(&pidlist_lock);
 
-	int error;
 	error = error_check(cmd, syscall, pid);
 	if (error != 0){
 		spin_unlock(&pidlist_lock);//unlock before returning to avoid problems
@@ -493,7 +494,6 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 	//BOJ: Proceed to implement commands (surrounded by locks of course)
 
-	int req;
 
 	if(cmd == REQUEST_SYSCALL_INTERCEPT){
 		req = request_intercept(syscall);
@@ -533,6 +533,9 @@ long (*orig_custom_syscall)(void);
  * - Ensure synchronization as needed.
  */
 static int init_function(void) {
+
+	int i;
+
 	spin_lock(&calltable_lock);
 	spin_lock(&pidlist_lock);
 	set_addr_rw((unsigned long)sys_call_table);
@@ -543,7 +546,6 @@ static int init_function(void) {
 	orig_exit_group = sys_call_table[__NR_exit_group];
 	sys_call_table[__NR_exit_group] = my_exit_group;
 
-	int i;
 
 	//Initialize bookkeeping data structures.
 	for(i=0; i < NR_syscalls; i++){
