@@ -338,6 +338,18 @@ int error_check(int cmd, int syscall, int pid){
 	}
 
 
+
+	// ***First 2 commands***
+	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE){
+
+		//Must be root
+		if (current_uid() != 0){
+			return -EPERM;
+		}
+	}
+
+
+
 	//***EBUSY conditions***
 	//BOJ: SURROUND BY LOCKS WHEN DEALING WITH PIDLISTS WHICH WE ARE
 	if(table[syscall].intercepted == 1 && cmd == REQUEST_SYSCALL_INTERCEPT){
@@ -350,14 +362,7 @@ int error_check(int cmd, int syscall, int pid){
 
 
 
-	// ***First 2 commands***
-	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE){
-
-		//Must be root
-		if (current_uid() != 0){
-			return -EPERM;
-		}
-	}
+	
 
 	//***Last 2 commands***
 	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING){
