@@ -295,7 +295,7 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 	func = table[reg.ax].f(reg); //BOJ: CROSSCHECK THIS
 
-	if (check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1){ //BOJ: crosscheck?
+	if ((check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1) || table[reg.ax].monitored == 2) { //BOJ: second condition should include something about not being in the blacklist
 		log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp); //info about pid and syscall
 	}
 
@@ -426,6 +426,51 @@ int request_intercept(int syscall){
 
 	return 0;
 
+ }
+
+/*
+ * Helper function for monitoring 
+ */
+ int start_monitoring(int syscall, int pid){
+ 	int add;
+ 	spin_lock(&calltable_lock);
+ 	spin_lock(&pidlist_lock);
+
+ 	if (check_pid_monitored(syscall, pid) == 0){
+ 		add = add_pid_sysc(pid, syscall);
+
+ 	}else{
+ 		add = -EBUSY;
+ 	}
+
+ 	if (pid == 0){ //ie monitoring every process.
+ 		table[syscall].monitored = 2;
+ 	}else{
+ 		table[syscall].monitored = 1;
+ 	}
+
+ 	spin_unlock(&pidlist_lock);
+ 	spin_unlock(&calltable_lock);
+
+ 	return add;
+
+ }
+
+ /*
+  * Helper function to stop monitoring 
+  */
+
+ int stop_monitoring(int pid, int syscall){
+ 	int stop;
+ 	spin_lock(&calltable_lock);
+ 	spin_lock(&pidlist_lock);
+
+ 	stop = del_pid_sysc(syscall, pid);
+
+ 	spin_unlock(&pidlist_lock);
+ 	spin_unlock(&calltable_lock);
+
+ 	return stop;
  }
 
 
