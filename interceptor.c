@@ -316,8 +316,8 @@ int error_check(int cmd, int syscall, int pid){
 	int ret_value;
 	ret_value = 0;
 
-	spin_lock(&calltable_lock);
-	spin_lock(&pidlist_lock);
+	//spin_lock(&calltable_lock);
+	//spin_lock(&pidlist_lock);
 	//spin_lock(&calltable_lock);
 	
 
@@ -386,8 +386,8 @@ int error_check(int cmd, int syscall, int pid){
 
 	}
 	
-	spin_unlock(&pidlist_lock);
-	spin_unlock(&calltable_lock);
+	//spin_unlock(&pidlist_lock);
+	//spin_unlock(&calltable_lock);
 
 	return ret_value; //returns 0 if no error occurs
 }
