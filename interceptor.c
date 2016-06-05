@@ -287,11 +287,12 @@ void my_exit_group(int status)
  */
 asmlinkage long interceptor(struct pt_regs reg) {
 
+	long func;
+
 	//BOJ: IS A LOCK NEEDED HERE?
 	spin_lock(&calltable_lock);
 	spin_lock(&pidlist_lock);
 
-	long func;
 	func = table[reg.ax].f(reg); //BOJ: CROSSCHECK THIS
 
 	if (check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1){ //BOJ: crosscheck?
