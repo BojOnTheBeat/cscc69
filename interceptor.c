@@ -554,6 +554,13 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 		req = request_release(syscall);
 
 	}
+	if (cmd = REQUEST_START_MONITORING){
+		req = start_monitoring(syscall, pid);
+	}
+
+	if (cmd = REQUEST_STOP_MONITORING){
+		req = stop_monitoring(syscall, pid);
+	}
 
 
 	
