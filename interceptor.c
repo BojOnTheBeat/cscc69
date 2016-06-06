@@ -371,7 +371,7 @@ int error_check(int cmd, int syscall, int pid){
 		}
 
 		// only root can monitor every single process.
-		if (pid == 0 && current->pid != 0){
+		if (pid == 0 && current_uid() != 0){
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
@@ -469,6 +469,8 @@ int request_intercept(int syscall){
  	int add;
  	spin_lock(&calltable_lock);
  	spin_lock(&pidlist_lock);
+
+
 
  	if (check_pid_monitored(syscall, pid) == 0){
  		add = add_pid_sysc(pid, syscall);
@@ -589,6 +591,14 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 
 	}
 	if (cmd == REQUEST_START_MONITORING){
+
+		if (pid == 0 && current_uid() != 0){
+
+			//spin_unlock(&pidlist_lock);
+			//spin_unlock(&calltable_lock);
+			return -EPERM;
+		}
+		
 		req = start_monitoring(syscall, pid);
 	}
 
