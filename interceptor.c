@@ -371,7 +371,7 @@ int error_check(int cmd, int syscall, int pid){
 		}
 
 		// only root can monitor every single process.
-		if (pid == 0 && current_uid() != 0){
+		if (pid == 0 && current->pid != 0){
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
