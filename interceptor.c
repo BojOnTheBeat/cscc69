@@ -332,7 +332,7 @@ int error_check(int cmd, int syscall, int pid){
 	}
 
 
-	if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL && pid != 0) ){
+	if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) ){ //&&pid != 0
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
