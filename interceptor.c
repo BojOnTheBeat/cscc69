@@ -362,13 +362,7 @@ int error_check(int cmd, int syscall, int pid){
 		// pid can't be negative and must belong to a valid process(except when pid is 0)
 
 
-		// only root can monitor every single process.
-		if (pid == 0 && current_uid() != 0){
 
-			//spin_unlock(&pidlist_lock);
-			//spin_unlock(&calltable_lock);
-			return -EPERM;
-		}	
 		
 		
 		//BOJ: crosscheck use of check_pid_from_list function
@@ -378,6 +372,15 @@ int error_check(int cmd, int syscall, int pid){
 			//spin_unlock(&calltable_lock);
 			return -EPERM;
 		}
+
+
+		// only root can monitor every single process.
+		if (pid == 0 && current_uid() != 0){
+
+			//spin_unlock(&pidlist_lock);
+			//spin_unlock(&calltable_lock);
+			return -EPERM;
+		}	
 
 		
 		
@@ -482,7 +485,7 @@ int request_intercept(int syscall){
  		add = -EBUSY;
  	}
 
- 	if (pid == 0){ //ie monitoring every process.
+ 	if (pid == 0 && current_uid() == 0){ //ie monitoring every process.
  		table[syscall].monitored = 2;
  	}else{
  		table[syscall].monitored = 1;
