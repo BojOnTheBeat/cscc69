@@ -363,7 +363,7 @@ int error_check(int cmd, int syscall, int pid){
 		
 		
 		//BOJ: crosscheck use of check_pid_from_list function
-		if (current_uid() != 0 && check_pid_from_list(current_uid(), pid) != 0){
+		if (current_uid() != 0 && check_pid_from_list(current->pid, pid) != 0){
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
