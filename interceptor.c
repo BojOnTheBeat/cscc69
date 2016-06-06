@@ -331,6 +331,57 @@ int error_check(int cmd, int syscall, int pid){
 		return -EINVAL;
 	}
 
+
+	if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL && pid != 0) ){
+
+			//spin_unlock(&pidlist_lock);
+			//spin_unlock(&calltable_lock);
+			return -EINVAL;
+
+		}
+
+	// ***First 2 commands***
+	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE){
+
+		//Must be root
+		if (current_uid() != 0){
+
+			//spin_unlock(&pidlist_lock);
+			//spin_unlock(&calltable_lock);
+			return -EPERM;
+		}
+	}
+
+
+	//***Last 2 commands***
+	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING){
+
+
+
+		//pid must be valid for these last 2 commands.
+		// pid can't be negative and must belong to a valid process(except when pid is 0)
+		
+		
+		//BOJ: crosscheck use of check_pid_from_list function
+		if (current_uid() != 0 && check_pid_from_list(current_uid(), pid) != 0){
+
+			//spin_unlock(&pidlist_lock);
+			//spin_unlock(&calltable_lock);
+			return -EPERM;
+		}
+
+		// only root can monitor every single process.
+		if (pid == 0 && current_uid() != 0){
+
+			//spin_unlock(&pidlist_lock);
+			//spin_unlock(&calltable_lock);
+			return -EPERM;
+		}	
+		
+
+	}
+
+
 	//Can't deintercept a syscall that hasn't been interepted yet.
 	if (table[syscall].intercepted == 0 && cmd == REQUEST_SYSCALL_RELEASE){
 
@@ -346,22 +397,6 @@ int error_check(int cmd, int syscall, int pid){
 		//spin_unlock(&calltable_lock);
 		return -EINVAL;
 	}
-
-
-
-	// ***First 2 commands***
-	if (cmd == REQUEST_SYSCALL_INTERCEPT || cmd == REQUEST_SYSCALL_RELEASE){
-
-		//Must be root
-		if (current_uid() != 0){
-
-			//spin_unlock(&pidlist_lock);
-			//spin_unlock(&calltable_lock);
-			return -EPERM;
-		}
-	}
-
-
 
 	//***EBUSY conditions***
 	//BOJ: SURROUND BY LOCKS WHEN DEALING WITH PIDLISTS WHICH WE ARE
@@ -383,41 +418,7 @@ int error_check(int cmd, int syscall, int pid){
 
 	
 
-	//***Last 2 commands***
-	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING){
-
-
-
-		//pid must be valid for these last 2 commands.
-		// pid can't be negative and must belong to a valid process(except when pid is 0)
-		if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL && pid != 0) ){
-
-			//spin_unlock(&pidlist_lock);
-			//spin_unlock(&calltable_lock);
-			return -EINVAL;
-
-		}
-		
-		//BOJ: crosscheck use of check_pid_from_list function
-		if (current_uid() != 0 && check_pid_from_list(current_uid(), pid) != 0){
-
-			//spin_unlock(&pidlist_lock);
-			//spin_unlock(&calltable_lock);
-			return -EPERM;
-		}
-
-		// only root can monitor every single process.
-		if (pid == 0 && current_uid() != 0){
-
-			//spin_unlock(&pidlist_lock);
-			//spin_unlock(&calltable_lock);
-			return -EPERM;
-		}
-
-		
-		
-
-	}
+	
 	
 	//spin_unlock(&pidlist_lock);
 	//spin_unlock(&calltable_lock);
