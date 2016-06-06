@@ -290,8 +290,8 @@ asmlinkage long interceptor(struct pt_regs reg) {
 	long func;
 
 	//BOJ: IS A LOCK NEEDED HERE?
-	//spin_lock(&calltable_lock);
-	//spin_lock(&pidlist_lock);
+	spin_lock(&calltable_lock);
+	spin_lock(&pidlist_lock);
 
 	func = table[reg.ax].f(reg); //BOJ: CROSSCHECK THIS
 
@@ -299,8 +299,8 @@ asmlinkage long interceptor(struct pt_regs reg) {
 		log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp); //info about pid and syscall
 	}
 
-	//spin_unlock(&pidlist_lock);
-	//spin_unlock(&calltable_lock);
+	spin_unlock(&pidlist_lock);
+	spin_unlock(&calltable_lock);
 
 	return func; //BOJ: crosscheck syntax for pointers to functions.
 }
@@ -332,7 +332,7 @@ int error_check(int cmd, int syscall, int pid){
 	}
 
 
-	if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) ){ //&&pid != 0
+	if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) ){ 
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
