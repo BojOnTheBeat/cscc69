@@ -413,8 +413,8 @@ int error_check(int cmd, int syscall, int pid){
 
 	}
 	
-	//spin_unlock(&pidlist_lock);
-	//spin_unlock(&calltable_lock);
+	spin_unlock(&pidlist_lock);
+	spin_unlock(&calltable_lock);
 
 	return 0; //returns 0 if no error occurss
 }
