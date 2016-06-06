@@ -385,6 +385,18 @@ int error_check(int cmd, int syscall, int pid){
 
 	//***Last 2 commands***
 	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING){
+
+
+
+		//pid must be valid for these last 2 commands.
+		// pid can't be negative and must belong to a valid process(except when pid is 0)
+		if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL && pid != 0) ){
+
+			//spin_unlock(&pidlist_lock);
+			//spin_unlock(&calltable_lock);
+			return -EINVAL;
+
+		}
 		
 		//BOJ: crosscheck use of check_pid_from_list function
 		if (current_uid() != 0 && check_pid_from_list(current_uid(), pid) != 0){
@@ -402,14 +414,8 @@ int error_check(int cmd, int syscall, int pid){
 			return -EPERM;
 		}
 
-		//pid must be valid for these last 2 commands.
-		// pid can't be negative and must belong to a valid process(except when pid is 0)
-		if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL && pid != 0) ){
-
-			//spin_unlock(&pidlist_lock);
-			//spin_unlock(&calltable_lock);
-			return -EINVAL;
-		}
+		
+		
 
 	}
 	
@@ -590,7 +596,6 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	}
 
 
-
 	return 0;
 }
 
@@ -659,7 +664,7 @@ static int init_function(void) {
  * - Ensure synchronization, if needed.
  */
 static void exit_function(void){
-	spin_lock(&calltable_lock);
+	spin_lock(&calltable_lock); 
 	set_addr_rw((unsigned long)sys_call_table);
 
 	sys_call_table[MY_CUSTOM_SYSCALL] = orig_custom_syscall; //BOJ: POINTER HERE?
