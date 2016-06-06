@@ -259,9 +259,9 @@ void my_exit_group(int status)
 	//BOJ : cross-check this. Read "POINTERS TO FUNCTIONS" again.
 	//SURROUND BY LOCKS SINCE WE'RE ACCESSING PIDLIST
 	int del;
-	//spin_lock(&pidlist_lock);
+	spin_lock(&pidlist_lock);
 	del = del_pid(current->pid); //doesn't matter if -1 is returned or not.
-	//spin_unlock(&pidlist_lock);
+	spin_unlock(&pidlist_lock);
 	return orig_exit_group(status);
 
 }
