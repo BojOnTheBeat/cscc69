@@ -512,13 +512,14 @@ int request_intercept(int syscall){
 
  	//if table[syscall].monitored = 2, add to table[syscall]'s pidlist.
 
+ 	//if pid is 0, we want to stop monitoring everything. So change .monitored to 0.
+
+ 	if (pid == 0){
+ 		table[syscall].monitored = 0;
+ 	}
  	
  	stop = del_pid_sysc(syscall, pid);
-
- 	if (table[syscall].monitored == 2 && pid != 0){
- 		add_pid_sysc(pid, syscall);
- 	}
- 		
+ 
 
  	spin_unlock(&pidlist_lock);
  	spin_unlock(&calltable_lock);
