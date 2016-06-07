@@ -488,8 +488,6 @@ int request_intercept(int syscall){
 
  		destroy_list(syscall); //empty the pidlist. Now it's a blacklist.
 
- 		//Re-initialize it maybe?
- 		INIT_LIST_HEAD(&table[syscall].my_list);
 
  		table[syscall].monitored = 2;
  	}else{
@@ -514,12 +512,8 @@ int request_intercept(int syscall){
 
  	//if table[syscall].monitored = 2, add to table[syscall]'s pidlist.
 
- 	if(table[syscall].monitored == 2){
- 		stop = add_pid_sysc(pid, syscall);
- 	}else{
  	
- 		stop = del_pid_sysc(syscall, pid);
- 		}
+ 	stop = del_pid_sysc(syscall, pid);
  		
 
  	spin_unlock(&pidlist_lock);
