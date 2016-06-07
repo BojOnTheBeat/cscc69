@@ -331,8 +331,16 @@ int error_check(int cmd, int syscall, int pid){
 		return -EINVAL;
 	}
 
+	// only root can monitor every single process.
+	if (pid == 0 && current_uid() != 0){
 
-	if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) ){ 
+		//spin_unlock(&pidlist_lock);
+		//spin_unlock(&calltable_lock);
+		return -EPERM;
+		}	
+
+
+	if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) ){ //does this return NULL when pid == 0?
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
@@ -367,13 +375,7 @@ int error_check(int cmd, int syscall, int pid){
 		}
 
 
-		// only root can monitor every single process.
-		if (pid == 0 && current_uid() != 0){
-
-			//spin_unlock(&pidlist_lock);
-			//spin_unlock(&calltable_lock);
-			return -EPERM;
-		}	
+		
 
 		
 		
