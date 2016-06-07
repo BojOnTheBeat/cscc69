@@ -332,7 +332,7 @@ int error_check(int cmd, int syscall, int pid){
 	}
 
 
-	if (pid < 0 || (pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) ){ 
+	if (pid < 0 || ((pid_task(find_vpid(pid), PIDTYPE_PID) == NULL) && pid != 0) ){ 
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
@@ -355,13 +355,6 @@ int error_check(int cmd, int syscall, int pid){
 
 	//***Last 2 commands***
 	if (cmd == REQUEST_START_MONITORING || cmd == REQUEST_STOP_MONITORING){
-
-
-
-		//pid must be valid for these last 2 commands.
-		// pid can't be negative and must belong to a valid process(except when pid is 0)
-
-
 
 		
 		
@@ -419,12 +412,6 @@ int error_check(int cmd, int syscall, int pid){
 		//spin_unlock(&calltable_lock);
 		return -EBUSY;
 	}
-
-
-
-	
-
-	
 	
 	//spin_unlock(&pidlist_lock);
 	//spin_unlock(&calltable_lock);
@@ -485,7 +472,7 @@ int request_intercept(int syscall){
  		add = -EBUSY;
  	}
 
- 	if (pid == 0 && current_uid() == 0){ //ie monitoring every process.
+ 	if (pid == 0){ //ie monitoring every process.
  		table[syscall].monitored = 2;
  	}else{
  		table[syscall].monitored = 1;
