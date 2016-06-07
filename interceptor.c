@@ -406,7 +406,10 @@ int error_check(int cmd, int syscall, int pid){
 
 		//spin_unlock(&pidlist_lock);
 		//spin_unlock(&calltable_lock);
-		return -EINVAL;
+		if(pid != 0){
+			return -EINVAL;
+		}
+		//return -EINVAL;
 	}
 
 	//***EBUSY conditions***
