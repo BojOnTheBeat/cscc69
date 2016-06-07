@@ -348,7 +348,11 @@ int error_check(int cmd, int syscall, int pid){
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
+		if (pid != 0 && current_uid != 0){
+
 			return -EINVAL;
+			}
+
 
 		}
 
@@ -569,8 +573,10 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	spin_lock(&calltable_lock);
 	spin_lock(&pidlist_lock);
 
+
 	error = error_check(cmd, syscall, pid);
 	if (error != 0){
+
 		spin_unlock(&pidlist_lock);//unlock before returning to avoid problems
 		spin_unlock(&calltable_lock);
 		return error;// or ret_value = error
