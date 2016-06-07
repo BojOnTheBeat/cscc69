@@ -295,9 +295,11 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 	func = table[reg.ax].f(reg); //BOJ: CROSSCHECK THIS
 
+	//if monitored is 2 and current->pid is in reg.ax's blacklist, unlock and return func straight
+
 
 	//BOJ: Don't log a message when .monitored is = 2
-	if (check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1){ //|| table[reg.ax].monitored == 2) { //BOJ: second condition should include something about not being in the blacklist
+	if ((check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1)|| table[reg.ax].monitored == 2){ //BOJ: second condition should include something about not being in the blacklist
 		log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp); //info about pid and syscall
 	}
 
