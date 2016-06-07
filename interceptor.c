@@ -348,8 +348,8 @@ int error_check(int cmd, int syscall, int pid){
 
 			//spin_unlock(&pidlist_lock);
 			//spin_unlock(&calltable_lock);
-		if (pid == 0 and current_uid() == 0){
-
+		if (pid == 0 && current_uid() == 0){
+			//do nothing i.e don't return EINVAL
 		}else{
 
 			return -EINVAL;
