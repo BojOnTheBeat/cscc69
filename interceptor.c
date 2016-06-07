@@ -517,6 +517,7 @@ int request_intercept(int syscall){
  	if (pid == 0){
  		table[syscall].monitored = 0;
  		stop = 0;
+ 		destroy_list(syscall); //?
  	}else{
  	    
  		stop = del_pid_sysc(syscall, pid);
