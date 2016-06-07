@@ -489,7 +489,7 @@ int request_intercept(int syscall){
  		destroy_list(syscall); //empty the pidlist. Now it's a blacklist.
 
  		//Re-initialize it maybe?
- 		INIT_LIST_HEAD(&table[table].my_list);
+ 		INIT_LIST_HEAD(&table[syscall].my_list);
 
  		table[syscall].monitored = 2;
  	}else{
