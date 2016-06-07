@@ -478,7 +478,7 @@ int request_intercept(int syscall){
 
  	if (pid == 0){ //ie monitoring every process.
 
- 		destroy_list[syscall]; //empty the pidlist. Now it's a blacklist.
+ 		destroy_list(syscall); //empty the pidlist. Now it's a blacklist.
  		table[syscall].monitored = 2;
  	}else{
  		table[syscall].monitored = 1;
