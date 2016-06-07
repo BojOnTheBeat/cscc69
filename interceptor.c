@@ -295,7 +295,9 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 	func = table[reg.ax].f(reg); //BOJ: CROSSCHECK THIS
 
-	if ((check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1) || table[reg.ax].monitored == 2) { //BOJ: second condition should include something about not being in the blacklist
+
+	//BOJ: Don't log a message when .monitored is = 2
+	if (check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1){ //|| table[reg.ax].monitored == 2) { //BOJ: second condition should include something about not being in the blacklist
 		log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp); //info about pid and syscall
 	}
 
@@ -475,6 +477,8 @@ int request_intercept(int syscall){
  	}
 
  	if (pid == 0){ //ie monitoring every process.
+
+ 		destroy_list[syscall]; //empty the pidlist. Now it's a blacklist.
  		table[syscall].monitored = 2;
  	}else{
  		table[syscall].monitored = 1;
@@ -495,6 +499,8 @@ int request_intercept(int syscall){
  	int stop;
  	spin_lock(&calltable_lock);
  	spin_lock(&pidlist_lock);
+
+ 	//if table[syscall].monitored = 2, add to table[syscall]'s pidlist.
 
  	stop = del_pid_sysc(syscall, pid);
 
