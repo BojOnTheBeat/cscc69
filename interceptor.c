@@ -509,12 +509,10 @@ int request_intercept(int syscall){
  	spin_lock(&pidlist_lock);
 
  	//if table[syscall].monitored = 2, add to table[syscall]'s pidlist.
- 	if (table[syscall].monitored == 2){
- 		stop = add_pid_sysc(pid, syscall);
- 	}else{
+ 	
 
- 		stop = del_pid_sysc(syscall, pid);
- 		}
+ 	stop = del_pid_sysc(syscall, pid);
+ 		
 
  	spin_unlock(&pidlist_lock);
  	spin_unlock(&calltable_lock);
