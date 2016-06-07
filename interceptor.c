@@ -514,7 +514,7 @@ int request_intercept(int syscall){
 
  	//if table[syscall].monitored = 2, add to table[syscall]'s pidlist.
 
- 	if(table[syscall].monitored = 2){
+ 	if(table[syscall].monitored == 2){
  		stop = add_pid_sysc(pid, syscall);
  	}else{
  	
