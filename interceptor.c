@@ -516,9 +516,10 @@ int request_intercept(int syscall){
 
  	if (pid == 0){
  		table[syscall].monitored = 0;
- 	}
- 	
- 	stop = del_pid_sysc(syscall, pid);
+ 	}else{
+ 	    
+ 		stop = del_pid_sysc(syscall, pid);
+ 		}
  
 
  	spin_unlock(&pidlist_lock);
