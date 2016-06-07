@@ -298,8 +298,8 @@ asmlinkage long interceptor(struct pt_regs reg) {
 	//if monitored is 2 and current->pid is in reg.ax's blacklist, unlock and return func straight
 
 
-	//BOJ: Don't log a message when .monitored is = 2
-	if ((check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1)|| table[reg.ax].monitored == 2){ //BOJ: second condition should include something about not being in the blacklist
+	//BOJ: Don't log a message when .monitored is = 2 and pid is in blacklist.
+	if ((check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1)|| (table[reg.ax].monitored == 2 && check_pid_monitored(reg.ax, current->pid) == 0) ){ //BOJ: second condition should include something about not being in the blacklist
 		log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp); //info about pid and syscall
 	}
 
@@ -509,8 +509,12 @@ int request_intercept(int syscall){
  	spin_lock(&pidlist_lock);
 
  	//if table[syscall].monitored = 2, add to table[syscall]'s pidlist.
+ 	if (table[syscall].monitored == 2){
+ 		add_pid_sysc(pid, syscall);
+ 	}else{
 
- 	stop = del_pid_sysc(syscall, pid);
+ 		stop = del_pid_sysc(syscall, pid);
+ 		}
 
  	spin_unlock(&pidlist_lock);
  	spin_unlock(&calltable_lock);
