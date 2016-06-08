@@ -527,8 +527,13 @@ int request_intercept(int syscall){
  		stop = 0;
  		destroy_list(syscall); //?
  	}else{
- 	    
- 		stop = del_pid_sysc(syscall, pid);
+ 		if (table[syscall].monitored == 2) { //we're currently monitoring all. So add this pid to the blacklist
+ 			add_pid_sysc(pid, syscall);
+
+ 		}else{
+ 			stop = del_pid_sysc(syscall, pid);
+ 			}
+
  		}
  
 
@@ -709,6 +714,7 @@ static void exit_function(void){
 	set_addr_rw((unsigned long)sys_call_table);
 
 
+	//Restore all intercepted syscalls to their originals
 	for(i=0; i < NR_syscalls; i++){
 		if (table[i].intercepted == 1){
 			sys_call_table[i] = table[i].f;
