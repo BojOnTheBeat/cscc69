@@ -619,6 +619,10 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	}
 	if (cmd == REQUEST_START_MONITORING){
 		req = start_monitoring(syscall, pid);
+
+		if (req == -ENOMEM){
+			return req;
+		}
 	}
 
 	if (cmd == REQUEST_STOP_MONITORING){
