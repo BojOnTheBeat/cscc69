@@ -429,9 +429,9 @@ int error_check(int cmd, int syscall, int pid){
 	}
 
 	//If we're already monitoring all pids, we can't monitor again.
-	if (table[syscall].monitored == 2 && cmd == REQUEST_START_MONITORING){
-		return -EBUSY;
-	}
+	//if (table[syscall].monitored == 2 && cmd == REQUEST_START_MONITORING){
+		//return -EBUSY;
+	//}
 	
 	//spin_unlock(&pidlist_lock);
 	//spin_unlock(&calltable_lock);
