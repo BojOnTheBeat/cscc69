@@ -385,7 +385,7 @@ int error_check(int cmd, int syscall, int pid){
 		}
 	}
 
-	if(table[syscall].monitored == 0 && pid == 0 && cmd = REQUEST_STOP_MONITORING){
+	if(table[syscall].monitored == 0 && pid == 0 && cmd == REQUEST_STOP_MONITORING){
 		return -EINVAL;
 	}
 
