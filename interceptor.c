@@ -430,9 +430,8 @@ int request_intercept(int syscall){
  	spin_lock(&calltable_lock);
 	set_addr_rw((unsigned long)sys_call_table);
 
-	sys_call_table[syscall] = table[syscall].f; //Put original syscall back in kernel syscall table
+	sys_call_table[syscall] = table[syscall].f; //REstore old syscall back
 	table[syscall].intercepted = 0;
-	//sys_call_table[syscall] = table[syscall].f; //restore the old syscall back
 
 	set_addr_ro((unsigned long)sys_call_table);
 	spin_unlock(&calltable_lock);
@@ -443,6 +442,7 @@ int request_intercept(int syscall){
 
 /*
  * Helper function for monitoring 
+ * Called if cmd == REQUEST_START_MONITORING
  */
  int start_monitoring(int syscall, int pid){
  	int add;
@@ -451,6 +451,7 @@ int request_intercept(int syscall){
 
 
 
+ 	//add pid to monitored list if we're not already monitoring
  	if (check_pid_monitored(syscall, pid) == 0){
  		add = add_pid_sysc(pid, syscall);
 
@@ -458,11 +459,9 @@ int request_intercept(int syscall){
  		add = -EBUSY;
  	}
 
- 	if (pid == 0){ //ie monitoring every process.
+ 	if (pid == 0){ //ie if we're monitoring every process.
 
  		destroy_list(syscall); //empty the pidlist. Now it's a blacklist.
-
-
 
  		table[syscall].monitored = 2;
  	}else{
@@ -478,6 +477,7 @@ int request_intercept(int syscall){
 
  /*
   * Helper function to stop monitoring 
+  * Called if cmd == REQUEST_STOP_MONITORI
   */
 
  int stop_monitoring(int pid, int syscall){
@@ -485,16 +485,18 @@ int request_intercept(int syscall){
  	spin_lock(&calltable_lock);
  	spin_lock(&pidlist_lock);
 
- 	//if table[syscall].monitored = 2, add to table[syscall]'s pidlist.
+ 	//BOJ: if table[syscall].monitored = 2, add to table[syscall]'s pidlist.
 
- 	//if pid is 0, we want to stop monitoring everything. So change .monitored to 0.
 
- 	if (pid == 0){
+ 	//if we get a command to stop monitoring all pids. Empty all pidlists. If not just remove the specified pid
+ 	//from monitored list.
+
+ 	if (pid == 0){ 
  		table[syscall].monitored = 0;
  		stop = 0;
- 		destroy_list(syscall); //?
+ 		destroy_list(syscall); 
+
  	}else{
- 		
  		
  		stop = del_pid_sysc(syscall, pid);
  			
@@ -567,21 +569,21 @@ asmlinkage long my_syscall(int cmd, int syscall, int pid) {
 	spin_lock(&pidlist_lock);
 
 
+	//Call error_check function defined above. Return the error if and error condition is detected.
 	error = error_check(cmd, syscall, pid);
 	if (error != 0){
 
 		spin_unlock(&pidlist_lock);//unlock before returning to avoid problems
 		spin_unlock(&calltable_lock);
-		return error;// or ret_value = error
+		return error;
 
 	}
 
-	spin_unlock(&pidlist_lock); // unlock anyway to free the locks
+	spin_unlock(&pidlist_lock); 
 	spin_unlock(&calltable_lock);
 
 	
 
-	//BOJ: Proceed to implement commands (surrounded by locks of course)
 
 
 	if(cmd == REQUEST_SYSCALL_INTERCEPT){
@@ -637,10 +639,10 @@ static int init_function(void) {
 	spin_lock(&pidlist_lock);
 	set_addr_rw((unsigned long)sys_call_table);
 
-	orig_custom_syscall = sys_call_table[MY_CUSTOM_SYSCALL]; //BOJ: pointer(&) or no? //BOJ: typecast?
+	orig_custom_syscall = sys_call_table[MY_CUSTOM_SYSCALL]; //Save the old MY_CUSTOM_SYSCALL and replace with syscall defined above
 	sys_call_table[MY_CUSTOM_SYSCALL] = (long*)my_syscall;
 
-	orig_exit_group = sys_call_table[__NR_exit_group];
+	orig_exit_group = sys_call_table[__NR_exit_group]; //Save the old exit group function and replace with newly defined one above
 	sys_call_table[__NR_exit_group] = my_exit_group;
 
 
@@ -686,7 +688,7 @@ static void exit_function(void){
 		}
 	}
 
-	sys_call_table[MY_CUSTOM_SYSCALL] = orig_custom_syscall; //BOJ: POINTER HERE?
+	sys_call_table[MY_CUSTOM_SYSCALL] = orig_custom_syscall; //Restore old syscalls
 	sys_call_table[__NR_exit_group] = orig_exit_group;
 
 
