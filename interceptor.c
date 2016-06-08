@@ -469,6 +469,8 @@ int request_intercept(int syscall){
  		add = -EBUSY;
  	}
 
+
+
  	if (pid == 0){ //ie if we're monitoring every process.
 
  		destroy_list(syscall); //empty the pidlist. Now it's a blacklist.
@@ -476,7 +478,7 @@ int request_intercept(int syscall){
  		table[syscall].monitored = 2;
  	}else{
  		table[syscall].monitored = 1;
- 	}
+ 		}
 
  	spin_unlock(&pidlist_lock);
  	spin_unlock(&calltable_lock);
