@@ -400,7 +400,7 @@ int error_check(int cmd, int syscall, int pid){
 		return -EBUSY;
 	}
 
-	if(table[syscall].monitored == 2 && cmd == REQUEST_START_MONITORING){
+	if(table[syscall].monitored == 2 && cmd == REQUEST_START_MONITORING && pid ==  0){
 		return -EBUSY;
 	}
 
