@@ -496,22 +496,13 @@ int request_intercept(int syscall){
  	//if we get a command to stop monitoring all pids. Empty all pidlists. If not just remove the specified pid
  	//from monitored list.
 
- 	if (table[syscall].monitored == 2 ){
- 		if (check_pid_monitored(syscall, pid) == 0){
- 		add_pid_sysc(pid, syscall);
- 		}
- 	}
-
  	if (pid == 0){ 
- 		table[syscall].monitored = 0;
+ 		//table[syscall].monitored = 0;
  		stop = 0;
  		destroy_list(syscall); 
 
  	}else{
-		
- 		stop = del_pid_sysc(syscall, pid);
- 			
-
+ 		stop = del_pid_sysc(syscall, pid);	
  		}
  
 
