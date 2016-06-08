@@ -527,12 +527,8 @@ int request_intercept(int syscall){
  		stop = 0;
  		destroy_list(syscall); //?
  	}else{
- 		if (table[syscall].monitored == 2) { //we're currently monitoring all. So add this pid to the blacklist
- 			stop = add_pid_sysc(pid, syscall);
-
- 		}else{
- 			stop = del_pid_sysc(syscall, pid);
- 			}
+ 		
+ 		stop = del_pid_sysc(syscall, pid);
 
  		}
  
