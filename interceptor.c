@@ -385,6 +385,7 @@ int error_check(int cmd, int syscall, int pid){
 		}
 	}
 
+	//Can't stop monitoring all pids if we're not monitoring any pids at the moment.
 	if(table[syscall].monitored == 0 && pid == 0 && cmd == REQUEST_STOP_MONITORING){
 		return -EINVAL;
 	}
