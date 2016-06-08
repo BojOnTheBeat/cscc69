@@ -711,7 +711,7 @@ static void exit_function(void){
 
 	for(i=0; i < NR_syscalls; i++){
 		if (table[i].intercepted == 1){
-			sys_call_table[i] = table[syscall].f;
+			sys_call_table[i] = table[i].f;
 		}
 	}
 
