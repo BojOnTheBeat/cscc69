@@ -294,7 +294,7 @@ asmlinkage long interceptor(struct pt_regs reg) {
 
 	
 	//Only log a message if the syscall is being monitored AND if it's not in a blacklist
-	if ((check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1)|| (table[reg.ax].monitored == 2 && check_pid_monitored(reg.ax, current->pid) == 0) ){ //BOJ: second condition should include something about not being in the blacklist
+	if ((check_pid_monitored(reg.ax, current->pid) == 1 && table[reg.ax].monitored == 1)|| (table[reg.ax].monitored == 2 && check_pid_monitored(reg.ax, current->pid) == 0) ){ 
 		log_message(current->pid, reg.ax, reg.bx, reg.cx, reg.dx, reg.si, reg.di, reg.bp); //info about pid and syscall
 	}
 
@@ -400,6 +400,7 @@ int error_check(int cmd, int syscall, int pid){
 		return -EBUSY;
 	}
 
+	//If all syscalls are already being monitored, Can't accept a 'monitor all' command.
 	if(table[syscall].monitored == 2 && cmd == REQUEST_START_MONITORING && pid ==  0){
 		return -EBUSY;
 	}
@@ -434,7 +435,7 @@ int request_intercept(int syscall){
  	spin_lock(&calltable_lock);
 	set_addr_rw((unsigned long)sys_call_table);
 
-	sys_call_table[syscall] = table[syscall].f; //REstore old syscall back
+	sys_call_table[syscall] = table[syscall].f; //Restore old syscall back
 	table[syscall].intercepted = 0;
 
 	set_addr_ro((unsigned long)sys_call_table);
@@ -495,13 +496,17 @@ int request_intercept(int syscall){
  	//if we get a command to stop monitoring all pids. Empty all pidlists. If not just remove the specified pid
  	//from monitored list.
 
+ 	if (table[syscall].monitored == 2 && pid != 0){
+ 		add_pid_sysc(pid, syscall);
+ 	}
+
  	if (pid == 0){ 
  		table[syscall].monitored = 0;
  		stop = 0;
  		destroy_list(syscall); 
 
  	}else{
- 		
+		
  		stop = del_pid_sysc(syscall, pid);
  			
 
