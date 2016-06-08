@@ -385,6 +385,10 @@ int error_check(int cmd, int syscall, int pid){
 		}
 	}
 
+	if(table[syscall].monitored == 0 && pid == 0 && cmd = REQUEST_STOP_MONITORING){
+		return -EINVAL;
+	}
+
 	//***EBUSY conditions***
 
 	//Can't intercept a syscall that's already being intercepted
@@ -482,7 +486,7 @@ int request_intercept(int syscall){
 
  /*
   * Helper function to stop monitoring 
-  * Called if cmd == REQUEST_STOP_MONITORI
+  * Called if cmd == REQUEST_STOP_MONITORING
   */
 
  int stop_monitoring(int pid, int syscall){
